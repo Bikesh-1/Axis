@@ -1,4 +1,5 @@
 "use client";
+
 import { account } from "../lib/appwrite";
 import { OAuthProvider } from "appwrite";
 
@@ -16,35 +17,84 @@ export default function Login() {
   };
 
   return (
-    <div className="relative w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
-      <div className="absolute w-full top-0 left-0 flex items-center justify-between p-2">
+    <div className="relative min-h-screen bg-black text-white overflow-hidden flex items-center justify-center px-6">
+
+      {/* Background Glow */}
+      <div className="absolute top-[-120px] left-[-120px] w-[300px] h-[300px] bg-violet-600/20 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-120px] right-[-120px] w-[300px] h-[300px] bg-indigo-500/20 blur-[120px] rounded-full" />
+
+      {/* Logo */}
+      <div className="absolute top-6 left-6">
         <img
-          className="w-40"
+          className="w-32"
           src="https://ik.imagekit.io/jwt52yyie/e33394b1-1bae-47ad-b3ac-a7d1723e23db.png?updatedAt=1779300879872"
-          alt="Logo"
+          alt="Axis Logo"
         />
       </div>
 
-      <div className="absolute top-[-100px] left-[-100px] w-72 h-72 bg-indigo-500/20 blur-[120px] rounded-full"></div>
-      <div className="absolute bottom-[-100px] right-[-100px] w-72 h-72 bg-purple-500/20 blur-[120px] rounded-full"></div>
+      {/* Main */}
+      <div className="relative z-10 w-full max-w-5xl flex items-center justify-between gap-20">
 
-      <div className="relative w-[420px] bg-white/5 border border-white/10 backdrop-blur-2xl rounded-3xl p-10 flex flex-col items-center justify-center shadow-2xl">
-        <p className="text-gray-400 text-center mt-3 mb-8">
-          Continue with your Google account to access your workspace.
-        </p>
-        <button
-          type="button"
-          onClick={googleLogin}
-          className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold text-lg py-4 rounded-2xl hover:scale-[1.02] transition-all duration-300"
-        >
-          <img
-            className="w-6 h-6"
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-          />
-          Continue with Google
-        </button>
-        <p className="text-gray-500 text-sm mt-6">Simple • Secure • Fast</p>
+        {/* Left Content */}
+        <div className="hidden lg:flex flex-col max-w-xl">
+          <p className="text-violet-400 uppercase tracking-[0.25em] text-sm mb-5">
+            Axis Workspace
+          </p>
+
+          <h1 className="text-6xl leading-tight font-black uppercase">
+            Store your
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-violet-400">
+              {" "}links,
+            </span>
+            <br />
+            files &
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-violet-400">
+              {" "}notes.
+            </span>
+          </h1>
+
+          <p className="text-gray-500 text-lg mt-6 leading-relaxed">
+            A clean and secure space to save everything important in one place.
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div className="w-full max-w-[400px] bg-white/[0.03] border border-white/10 backdrop-blur-2xl rounded-3xl p-8">
+
+          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+            <img
+              className="w-7 h-7"
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+            />
+          </div>
+
+          <h2 className="text-3xl font-semibold">
+            Welcome to Axis
+          </h2>
+
+          <p className="text-gray-500 mt-3 leading-relaxed">
+            Sign in with Google to continue to Axis.
+          </p>
+
+          <button
+            onClick={googleLogin}
+            className="w-full mt-8 h-14 rounded-2xl bg-white text-black font-medium flex items-center justify-center gap-3 hover:bg-gray-200 transition-all duration-300"
+          >
+            <img
+              className="w-5 h-5"
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+            />
+            Continue with Google
+          </button>
+
+          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-600">
+            <p>Notes</p>
+            <p>Files</p>
+            <p>Links</p>
+          </div>
+        </div>
       </div>
     </div>
   );
