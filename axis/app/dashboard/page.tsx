@@ -40,7 +40,8 @@ export default function Dashboard() {
   const getNotes = async () => {
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTION_ID
+      COLLECTION_ID,
+      
     );
 
     setNotes(response.documents);
