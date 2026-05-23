@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { account, databases, ID } from "../lib/appwrite";
+import { Query } from "appwrite";
 
 export default function DashboardClient() {
   const router = useRouter();
@@ -26,7 +27,8 @@ export default function DashboardClient() {
       {
         title: formData.title,
         description: formData.description,
-        link: formData.link
+        link: formData.link,
+        userId: user.$id
       }
     );
     setFormData({
@@ -41,15 +43,19 @@ export default function DashboardClient() {
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTION_ID,
-      
+      [
+    Query.equal("userId", user.$id)
+  ]
     );
 
     setNotes(response.documents);
   };
 
-  useEffect(() => {
+useEffect(() => {
+  if (user) {
     getNotes();
-  }, []);
+  }
+}, [user]);
 
 
   useEffect(() => {
