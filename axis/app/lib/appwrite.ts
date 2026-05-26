@@ -1,13 +1,12 @@
-import { Client, Account, TablesDB, Databases } from 'appwrite';
+import { Client, Account, Databases, Storage } from 'appwrite';
 
 export const client = new Client();
 
-export const tablesDB = new TablesDB(client);
-
 client
-    .setEndpoint('https://fra.cloud.appwrite.io/v1')
-    .setProject('6a0cc31e000b8095a839');
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
 
 export const account = new Account(client);
 export const databases = new Databases(client);
+export const storage = new Storage(client);
 export { ID } from 'appwrite';

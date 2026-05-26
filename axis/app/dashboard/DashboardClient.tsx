@@ -2,22 +2,60 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { account, databases, ID } from "../lib/appwrite";
+import { account, databases, ID, storage } from "../lib/appwrite";
 import { Query } from "appwrite";
 
 export default function DashboardClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [imageUrl, setImageUrl] = useState("");
+  const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fileId, setFileId] = useState("");
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    link: ""
+    link: "",
+    image: "",
+    fileId: "",
   })
-  const DATABASE_ID = "6a0f39dd0006f170be30";
-  const COLLECTION_ID = "dashboardcontent";
+  const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
+  const COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID!;
+  const BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID!;
+
+  const uploadFile = async (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    try {
+      const response = await storage.createFile(
+        BUCKET_ID,
+        ID.unique(),
+        file,
+      );
+      setFileId(response.$id);
+      const filePreview = storage.getFilePreview(
+        BUCKET_ID,
+        response.$id
+      );
+      setImageUrl(filePreview);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+const downloadFile = (fileId:any) => {
+  const downloadUrl = storage.getFileDownload(
+    BUCKET_ID,
+    fileId
+  );
+
+  window.open(downloadUrl);
+};
 
   const addNote = async (e: any) => {
     await databases.createDocument(
@@ -28,7 +66,9 @@ export default function DashboardClient() {
         title: formData.title,
         description: formData.description,
         link: formData.link,
-        userId: user.$id
+        userId: user.$id,
+        image: imageUrl,
+        fileId: fileId,
       }
     );
     setFormData({
@@ -44,18 +84,18 @@ export default function DashboardClient() {
       DATABASE_ID,
       COLLECTION_ID,
       [
-    Query.equal("userId", user.$id)
-  ]
+        Query.equal("userId", user.$id)
+      ]
     );
 
     setNotes(response.documents);
   };
 
-useEffect(() => {
-  if (user) {
-    getNotes();
-  }
-}, [user]);
+  useEffect(() => {
+    if (user) {
+      getNotes();
+    }
+  }, [user]);
 
 
   useEffect(() => {
@@ -110,8 +150,13 @@ useEffect(() => {
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-medium">Welcome to Axis, <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-white to-violet-400 font-black uppercase">{user?.name || "N/A"}</span></h2>
           <button
+            onClick={() => setOpen(true)}
+            className="w-auto px-4 py-2 font-semibold text-black transition bg-gradient-to-r from-white to-violet-400 rounded-xl hover:scale-105 cursor-pointer">
+            + Add Resource
+          </button>
+          <button
             onClick={logout}
-            className="w-auto px-4 py-2 font-semibold text-black transition bg-white rounded-xl hover:scale-105"
+            className="w-auto px-4 py-2 font-semibold text-black transition bg-white rounded-xl hover:scale-105 cursor-pointer"
           >
             Logout
           </button>
@@ -119,62 +164,89 @@ useEffect(() => {
       </div>
       <div className="flex items-center justify-center">
 
+        {/* adding resourece component */}
 
-        <div className="h-[80vh] w-1/2 flex items-center justify-center px-10 border-r">
+        {open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
 
-          <form onSubmit={addNote} className="w-full max-w-md flex flex-col gap-5">
+            {/* Popup Box */}
+            <div className="relative w-[90%] md:w-[50%] h-auto bg-[#0f0f0f]/90 border border-white/10 rounded-3xl shadow-2xl p-8">
 
-            <div className="mb-3">
-              <h1 className="text-4xl font-bold text-white">
-                Add Resource
-              </h1>
+              {/* Close Button */}
+              <button
+                onClick={() => setOpen(false)}
+                className="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition"
+              >
+                ✕
+              </button>
 
-              <p className="text-gray-400 mt-2">
-                Save your important links and notes.
-              </p>
+              <form
+                onSubmit={addNote}
+                className="w-full flex flex-col gap-5"
+              >
+                <div className="mb-3">
+                  <h1 className="text-4xl font-bold text-white">
+                    Add Resource
+                  </h1>
+
+                  <p className="text-gray-400 mt-2">
+                    Save your important links and notes.
+                  </p>
+                </div>
+
+                <input
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  type="text"
+                  placeholder="Enter title"
+                  className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
+                />
+
+                <textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Enter description"
+                  rows={4}
+                  className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none resize-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
+                />
+                <input type="file" onChange={uploadFile} />
+                {/* Link */}
+                <br />
+                <br />
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt="preview"
+                    width={300}
+                  />
+                )}
+                <input
+                  value={formData.link}
+                  onChange={(e) =>
+                    setFormData({ ...formData, link: e.target.value })
+                  }
+                  type="text"
+                  placeholder="Paste URL"
+                  className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
+                />
+
+                <button
+                  type="submit"
+                  className="w-full bg-[#4E46E4] hover:bg-[#5d56ff] text-white font-semibold py-4 rounded-2xl transition-all duration-300"
+                >
+                  Submit Resource
+                </button>
+              </form>
             </div>
+          </div>
+        )}
+        <div className="h-auto w-full px-10 py-10 ">
 
-            <input
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              type="text"
-              placeholder="Enter title"
-              className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
-            />
-
-            <textarea
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Enter description"
-              rows={4}
-              className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none resize-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
-            />
-
-            <input
-              value={formData.link}
-              onChange={(e) =>
-                setFormData({ ...formData, link: e.target.value })
-              }
-              type="text"
-              placeholder="Paste URL"
-              className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
-            />
-
-            <button
-              type="submit"
-              className="w-full bg-[#4E46E4] hover:bg-[#5d56ff] text-white font-semibold py-4 rounded-2xl transition-all duration-300">
-              Submit Resource
-            </button>
-
-          </form>
-        </div>
-        <div className="h-[80vh] w-1/2 px-10 py-10 overflow-y-auto">
-
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-4 gap-6">
 
             {notes.map((item) => (
               <div
@@ -192,7 +264,6 @@ useEffect(() => {
                   {item.description}
                 </p>
 
-                {/* Link */}
                 <a
                   href={item.link}
                   target="_blank"
@@ -200,7 +271,9 @@ useEffect(() => {
                 >
                   Open Link →
                 </a>
-
+                <button onClick={() => downloadFile(item.fileId)}>
+  Download File
+</button>
                 {/* View More */}
                 {item.description.length > 120 && (
                   <button className="mt-5 block text-sm text-gray-400 hover:text-white transition">
