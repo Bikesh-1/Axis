@@ -8,9 +8,9 @@ export default function Login() {
     try {
       await account.createOAuth2Token(
         OAuthProvider.Google,
-        // "https://axis-axis.appwrite.network/dashboard",
-        "http://localhost:3000/dashboard",
-        "http://localhost:3000/login"
+        "https://axis-axis.appwrite.network/dashboard",
+        // "http://localhost:3000/dashboard",
+        "https://axis-axis.appwrite.network/login"
       );
     } catch (error) {
       console.error("Google Login Error:", error);

@@ -22,9 +22,9 @@ export default function DashboardClient() {
     image: "",
     fileId: "",
   })
-  const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
-  const COLLECTION_ID = process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID!;
-  const BUCKET_ID = process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID!;
+  const DATABASE_ID = "6a0f39dd0006f170be30";
+  const COLLECTION_ID = "dashboardcontent";
+  const BUCKET_ID = "6a0f3cee003a4e1e1866";
 
   const uploadFile = async (e) => {
     const file = e.target.files[0];
