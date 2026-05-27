@@ -26,7 +26,7 @@ export default function DashboardClient() {
   const COLLECTION_ID = "dashboardcontent";
   const BUCKET_ID = "6a0f3cee003a4e1e1866";
 
-  const uploadFile = async (e:any) => {
+  const uploadFile = async (e: any) => {
     const file = e.target.files[0];
 
     if (!file) return;
@@ -48,14 +48,14 @@ export default function DashboardClient() {
     }
   };
 
-const downloadFile = (fileId:any) => {
-  const downloadUrl = storage.getFileDownload(
-    BUCKET_ID,
-    fileId
-  );
+  const downloadFile = (fileId: any) => {
+    const downloadUrl = storage.getFileDownload(
+      BUCKET_ID,
+      fileId
+    );
 
-  window.open(downloadUrl);
-};
+    window.open(downloadUrl);
+  };
 
   const addNote = async (e: any) => {
     await databases.createDocument(
@@ -215,7 +215,41 @@ const downloadFile = (fileId:any) => {
                   rows={4}
                   className="w-full border border-white/20 bg-transparent text-white placeholder:text-gray-500 px-5 py-4 rounded-2xl outline-none resize-none focus:border-[#4E46E4] focus:ring-2 focus:ring-[#4E46E4]/40 transition-all"
                 />
-                <input type="file" onChange={uploadFile} />
+                <div className="flex items-center justify-center w-full">
+  <label className="w-full max-w-md cursor-pointer">
+    
+    <div className="flex flex-col items-center justify-center w-full h-52 border-2 border-dashed border-indigo-500 rounded-2xl bg-[#0f172a] hover:bg-[#111c35] transition-all duration-300 shadow-lg">
+      
+      <svg
+        className="w-12 h-12 mb-4 text-indigo-400"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+        />
+      </svg>
+
+      <p className="text-lg font-semibold text-white">
+        Click to upload file
+      </p>
+
+      <p className="text-sm text-gray-400 mt-1">
+        PNG, JPG, PDF up to 10MB
+      </p>
+    </div>
+
+    <input
+      type="file"
+      onChange={uploadFile}
+      className="hidden"
+    />
+  </label>
+</div>
                 {/* Link */}
                 <br />
                 <br />
@@ -273,10 +307,10 @@ const downloadFile = (fileId:any) => {
                 >
                   Open Link →
                 </a>
-                <button onClick={() => downloadFile(item.fileId)}>
-  Download File
-</button>
-                {/* View More */}
+                <button className="w-auto px-4 py-2 font-semibold text-black transition bg-gradient-to-r from-white to-violet-400 rounded-xl hover:scale-105 cursor-pointer" onClick={() => downloadFile(item.fileId)}>
+                  Download File
+                </button>
+
                 {item.description.length > 120 && (
                   <button className="mt-5 block text-sm text-gray-400 hover:text-white transition">
                     View More
