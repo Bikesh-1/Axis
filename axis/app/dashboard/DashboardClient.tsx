@@ -26,7 +26,7 @@ export default function DashboardClient() {
   const COLLECTION_ID = "dashboardcontent";
   const BUCKET_ID = "6a0f3cee003a4e1e1866";
 
-  const uploadFile = async (e) => {
+  const uploadFile = async (e:any) => {
     const file = e.target.files[0];
 
     if (!file) return;
@@ -74,7 +74,9 @@ const downloadFile = (fileId:any) => {
     setFormData({
       title: "",
       description: "",
-      link: ""
+      link: "",
+      image: "",
+      fileId: "",
     });
     getNotes();
   };
